@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QUIZ1 - System Informationi & Networking Commands</title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTECH INNOVATIONS </h1>
+<h2>QUIZ1 - 2026</h2>
+<p>System Information & Networking Commands</p>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const questions=[
+{q:"What does id command show?",options:["Disk usage","User and group IDs","Network configuration","CPU details"],answer:1},
+{q:"What is output of whoami?",options:["Current kernel version","Current logged-in username","System uptime","IP address"],answer:1},
+{q:"What does uptime display?",options:["Only boot time","System load and running time","Disk partitions","Memory usage only"],answer:1},
+{q:"What is the purpose of ifconfig?",options:["Manage users","Show CPU info","Show network interfaces","Manage files"],answer:2},
+{q:"What does nmcli device show display?",options:["CPU details","Disk partitions","Memory info","Network device information"],answer:3},
+{q:"What does lsblk show?",options:["CPU info","Network stats","Memory usage","Block devices (disks/partitions)"],answer:3},
+{q:"Which command shows CPU details?",options:["cpuinfo","lscpu","cpustat","procinfo"],answer:1},
+{q:"What does free -m show?",options:["CPU usage","Maximum Memory","Free Memory","Memory in MB"],answer:3},
+{q:"What is the purpose of a subnet mask in networking?",options:["Assign IP address","Separate network and host portion of an IP","Provide DNS resolution","Assign MAC address"],answer:1},
+{q:"Which command shows logged-in user?",options:["login","whoami","id","iduser"],answer:1},
+{q:"What is the main function of DHCP?",options:["Resolve domain names","Assign IP addresses automatically","Encrypt traffic","Manage routing tables"],answer:1},
+{q:"Which command shows system memory?",options:["memshow","free","ramstat","memory"],answer:1},
+{q:"What is the role of DNS?",options:["Assign IP addresses","Convert domain names to IP addresses","Manage routing","Assign subnet masks"],answer:1},
+{q:"Which command shows both CPU architecture and cores?",options:["lscpu","cpuinfo","archinfo","syscpu"],answer:0},
+{q:"What is a default gateway used for?",options:["Assign IP address","Connect different networks","Encrypt data","Resolve DNS"],answer:1},
+{q:"What is the main purpose of ifconfig?",options:["Check CPU load","Configure network interfaces","Show memory usage","Display disk partitions"],answer:1},
+{q:"Which command shows system load average?",options:["lscpu","loadavg","sysload","uptime"],answer:3},
+{q:"What kind of device information does nmcli device show provide?",options:["CPU details","Network device configuration","Disk health","User login details"],answer:1},
+{q:"Which command shows since how long server is up?",options:["time","uptime","date","clock"],answer:1},
+{
+q:"What is the IP of server in the given output of ifconfig command?",
+output:`eno49: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.101  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::2a80:23ff:feaa:320c  prefixlen 64  scopeid 0x20<link>
+        ether 28:80:23:aa:32:0c  txqueuelen 1000  (Ethernet)
+        RX packets 19889184  bytes 11439871577 (10.6 GiB)
+        TX packets 34906385  bytes 33832995800 (31.5 GiB)
+        device interrupt 16`,
+options:["192.168.1.1","28:80:23:aa:32:0c","192.168.1.101","192.168.1.255"],answer:2
+}
+];
+
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+setTimeout(showResult,500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>
+
