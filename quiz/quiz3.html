@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QUIZ3 - Server Hardware, BIOS, RAID & Ports</title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTECH INNOVATIONS </h1>
+<h2>QUIZ3 – 2026</h2>
+<h1> Server Hardware, BIOS, RAID & Ports </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const questions = [
+{
+q:"What does BIOS stand for?",
+options:["Basic Internet Operating System","Basic Input/Output System","Binary Input Operating System","Boot Initialization Operating System"],
+answer:1
+},
+{
+q:"Where is BIOS stored?",
+options:["Hard Drive","RAM","Motherboard Chip","CPU"],
+answer:2
+},
+{
+q:"Which setting is typically stored in CMOS?",
+options:["Word Documents","System Date and Time","Database Records","Browser Cache"],
+answer:1
+},
+{
+q:"What does hot-swappable mean?",
+options:["Drive can be removed while powered off","Drive can be replaced without shutting down the server","Drive runs at higher temperature","Drive can only be replaced by BIOS"],
+answer:1
+},
+{
+q:"Which technology combines multiple physical disks into one logical unit?",
+options:["CMOS","DIMM","RAID","PCI"],
+answer:2
+},
+{
+q:"RAID stands for:",
+options:["Rapid Access Independent Disks","Redundant Array of Independent Disks","Reliable Array of Internal Drives","Remote Access Independent Disks"],
+answer:1
+},
+{
+q:"RAID combines:",
+options:["CPUs","Memory Modules","Hard Drives","Network Cards"],
+answer:2
+},
+{
+q:"A DIMM slot is:",
+options:["RAM Module","Hard Drive Bay","Connector that holds RAM","PCI Slot"],
+answer:2
+},
+{
+q:"A PCI card is used to:",
+options:["Add New Functionality","Replace BIOS","Replace RAM","Replace CPU"],
+answer:0
+},
+{
+q:"What is a RAID card?",
+options:["Network Adapter","Hardware RAID Controller","Memory Module","BIOS Chip"],
+answer:1
+},
+{
+q:"What is a management port used for?",
+options:["Application Data","Remote Server Management","User File Storage","Memory Expansion"],
+answer:1
+},
+{
+q:"Which technology is Dell's out-of-band management solution?",
+options:["iLO","IPMI","iDRAC","Fibre Channel"],
+answer:2
+},
+{
+q:"Which technology is HPE's out-of-band management solution?",
+options:["iDRAC","iLO","SATA","NVMe"],
+answer:1
+},
+{
+q:"Which component stores temporary data for active processes?",
+options:["CPU","RAM","CMOS","RAID Controller"],
+answer:1
+},
+{
+q:"Which component is commonly referred to as the 'brain' of the computer?",
+options:["RAM","Hard Drive","CPU","NIC"],
+answer:2
+},
+{
+q:"Which server resource is responsible for network communication?",
+options:["DIMM","CPU","NIC (Network Interface Card)","CMOS"],
+answer:2
+},
+{
+q:"Which command is commonly used in Linux to view CPU information?",
+options:["df -h","free -m","lscpu","ip addr"],
+answer:2
+},
+{
+q:"Which Linux command displays RAM usage?",
+options:["lscpu","free -m","ip addr","hostnamectl"],
+answer:1
+},
+{
+q:"Which Linux command displays IP address information?",
+options:["free -m","lscpu","ifconfig","hostnamectl"],
+answer:2
+},
+{
+q:"Which command can be used to test connectivity to another IP address?",
+options:["free -m","ping","lscpu","hostnamectl"],
+answer:1
+}
+];
+
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+setTimeout(showResult,500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>
+
