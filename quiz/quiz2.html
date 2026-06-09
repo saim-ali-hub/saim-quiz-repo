@@ -129,6 +129,7 @@ display:block;
 <div class="logo-container">
     <img src="/images/image.png" alt="Logo">
 </div>
+
 <div class="container">
 <div class="header">
 <h1>LINOOPTECH INNOVATIONS </h1>
@@ -150,6 +151,7 @@ display:block;
 <div class="popup" id="popup"></div>
 
 <script>
+const QUIZ_NAME = "quiz2";
 const questions = [
   {
     q: "Which command displays the current working directory?",
@@ -316,7 +318,10 @@ wrongList.push({q:questions[current].q,correct:questions[current].options[questi
 }
 
 if(correct+wrong===questions.length){
-setTimeout(showResult,500);
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
 }
 }
 
@@ -343,6 +348,29 @@ ${reviewHTML}
 `;
 }
 
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("http://192.168.111.107:8080/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
 function closeModal(){
 modal.style.display="none";
 }
@@ -350,5 +378,4 @@ modal.style.display="none";
 
 </body>
 </html>
-
 
