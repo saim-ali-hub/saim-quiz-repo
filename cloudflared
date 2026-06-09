@@ -1,0 +1,12 @@
+# Add cloudflared.repo to /etc/yum.repos.d/
+curl -fsSl https://pkg.cloudflare.com/cloudflared.repo | sudo tee /etc/yum.repos.d/cloudflared.repo
+
+#update repo
+sudo yum update
+
+# install cloudflared
+sudo yum install cloudflared
+
+# Configure  Cloudflared application
+sudo cloudflared service install eyJhIjoiZjcwN2JjMDdhNjA1NjMxMTY4Mjg4ZTNlMzYyMGRmZTYiLCJ0IjoiOGJmN2VhY2MtOTc1Zi00NDBiLWJlY2MtNTA5MTBmYzhlNDA0IiwicyI6Ik5XSTNOVFl6TURjdE5UZGhaQzAwTlRRMUxXSXdNVE10WmpNNFpURmxOMll5T1RGbSJ9
+
