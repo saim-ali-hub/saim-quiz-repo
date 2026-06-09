@@ -1,0 +1,234 @@
+<?php
+
+$action = $_GET['action'] ?? '';
+
+if ($action === "save_result") {
+
+    $student = $_POST['name'] ?? 'UNKNOWN';
+    $quiz    = $_POST['quiz'] ?? 'quiz_unknown';
+    $total   = $_POST['total'] ?? 0;
+    $passed  = $_POST['passed'] ?? 0;
+    $percent = round($_POST['percent'] ?? 0);
+
+    $date = date("Y-m-d H:i:s");
+
+    // sanitize quiz & student name
+    $quiz = preg_replace("/[^a-zA-Z0-9_]/", "", $quiz);
+    $student = preg_replace('/[^a-zA-Z0-9 _.-]/', '', $student);
+    $result_dir = "/var/www/quiz/result/" . $quiz;
+
+    if (!is_dir($result_dir)) {
+        mkdir($result_dir, 0755, true);
+    }
+
+    $txt_file = $result_dir . "/result_" . $quiz . ".txt";
+        
+    if (!file_exists($txt_file)) {
+        $header =
+        "Result - " . strtoupper($quiz) . "\n" .
+        "===============================================================\n" .
+        "Sr  Username        Date                Total Passed Percentage\n" .
+        "---------------------------------------------------------------\n";
+
+        file_put_contents($txt_file, $header);
+    }
+
+    $sr = 1;
+
+    if (file_exists($txt_file)) {
+       $lines = file($txt_file, FILE_IGNORE_NEW_LINES);
+       $sr = count($lines) - 3;
+       $sr = max($sr, 1);
+    }
+
+    $line = sprintf(
+        "%-3d %-15s %-19s %-6d %-6d %-10s\n",
+        $sr,
+        $student,
+        $date,
+        $total,
+        $passed,
+        $percent . "%"
+    );
+
+    file_put_contents($txt_file, $line, FILE_APPEND);
+
+    $raw_file = $result_dir . "/result_" . $quiz . ".data";
+
+    file_put_contents(
+        $raw_file,
+        implode("|", [
+           $student,
+           $date,
+           $total,
+           $passed,
+           $percent
+       ]) . "\n",
+       FILE_APPEND
+   );
+
+   $records = file($raw_file, FILE_IGNORE_NEW_LINES);
+
+   $html = "
+   <html>
+   <head>
+   <title>$quiz Results</title>
+   <style>
+   body{font-family:Arial}
+   table{
+   border-collapse:collapse;
+   width:90%;
+   margin:auto;
+   }
+   th,td{
+   border:1px solid #ccc;
+   padding:8px;
+   text-align:center;
+   }
+   th{
+   background:#333;
+   color:#fff;
+   }
+   </style>
+   </head>
+   <body>
+
+   <h2 align='center'>All Results - $quiz</h2>
+
+   <table>
+   <tr>
+   <th>Sr</th>
+   <th>User</th>
+   <th>Date</th>
+   <th>Total</th>
+   <th>Passed</th>
+   <th>Percent</th>
+   </tr>
+   ";
+
+   $sr = 1;
+
+   foreach ($records as $row) {
+      $data = explode("|", $row);
+      if (count($data) != 5) continue;
+      list($user,$dt,$tot,$pass,$pct) = $data;
+      
+      $html .= "
+      <tr>
+      <td>$sr</td>
+      <td>$user</td>
+      <td>$dt</td>
+      <td>$tot</td>
+      <td>$pass</td>
+      <td>$pct%</td>
+      </tr>
+      ";
+
+      $sr++;
+   }
+
+   $html .= "</table></body></html>";
+
+   file_put_contents(
+      $result_dir . "/result_" . $quiz . ".html",
+      $html
+   );
+
+   $best = [];
+
+   foreach ($records as $row) {
+      $data = explode("|", $row);
+
+      if (count($data) != 5) {
+      continue;
+      }
+      list($user,$dt,$tot,$pass,$pct) = $data;
+      $pct = intval($pct);
+
+      if (
+          !isset($best[$user]) ||
+          $pct > intval($best[$user]['percent'])
+      ) {
+          $best[$user] = [
+             'user' => $user,
+             'date' => $dt,
+             'total' => $tot,
+             'passed' => $pass,
+             'percent' => $pct
+         ];
+      }
+   }
+
+   $leaderboard = array_values($best);
+
+   usort($leaderboard, function($a,$b){
+
+      return $b['percent'] <=> $a['percent'];
+
+   });
+
+   $html = "
+   <html>
+   <head>
+   <title>$quiz Leaderboard</title>
+   <style>
+   body{font-family:Arial}
+   table{
+   border-collapse:collapse;
+   width:90%;
+   margin:auto;
+   }
+   th,td{
+   border:1px solid #ccc;
+   padding:8px;
+   text-align:center;
+   }
+   th{
+   background:#006400;
+   color:white;
+   }
+   </style>
+   </head>
+   <body>
+
+   <h2 align='center'>Leaderboard - $quiz</h2>
+
+   <table>
+   <tr>
+   <th>Rank</th>
+   <th>User</th>
+   <th>Best Score</th>
+   <th>Passed</th>
+   <th>Date</th>
+   </tr>
+   ";
+
+   $rank = 1;
+
+   foreach ($leaderboard as $row) {
+
+      $html .= "
+      <tr>
+      <td>$rank</td>
+      <td>{$row['user']}</td>
+      <td>{$row['percent']}%</td>
+      <td>{$row['passed']}</td>
+      <td>{$row['date']}</td>
+      </tr>
+      ";
+
+      $rank++;
+   }
+
+   $html .= "</table></body></html>";
+
+   file_put_contents(
+       $result_dir . "/result_" . $quiz . "_sorted.html",
+       $html
+   );
+
+
+    echo "OK";
+    exit;
+}
+echo "Invalid action";
