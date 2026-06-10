@@ -8,69 +8,20 @@ drwxr-x---. 2 apache apache 42 May 15 17:42 /var/www/quiz/
 -rw-r-----. 1 apache apache 8438 Jun  9 01:07 quiz3.html
 drwxr-x---. 2 apache apache    6 Jun  9 03:01 result
 
+[root@platform quiz]# ls -ld result/
+drwxr-x---. 5 apache apache 45 Jun 10 01:14 result/
+
+[root@platform quiz]# ls -l result/
+drwxr-xr-x. 2 apache apache 112 Jun 10 03:25 quiz1
+drwxr-xr-x. 2 apache apache   6 Jun 10 01:14 quiz2
+drwxr-xr-x. 2 apache apache 112 Jun 10 02:04 quiz3
+
 [root@platform html]# ls -ld /var/www/html
 drwxr-xr-x. 3 apache apache root 38 Jun  8 21:27 .
 
 [root@platform html]# ls -l 
 drwxr-xr-x. 2 apache apache   42 Jun  8 21:27 images
 -rw-r--r--. 1 apache apache 4962 Jun  8 21:14 index.html
-
-
-[root@platform www]# cat /var/www/html/api.php
-<?php
-
-$action = $_GET['action'] ?? '';
-
-if ($action === "save_result") {
-
-    $student = $_POST['name'] ?? 'UNKNOWN';
-    $quiz    = $_POST['quiz'] ?? 'quiz_unknown';
-    $total   = $_POST['total'] ?? 0;
-    $passed  = $_POST['passed'] ?? 0;
-    $percent = $_POST['percent'] ?? 0;
-
-    $date = date("Y-m-d H:i:s");
-
-    // sanitize quiz & student name
-    $quiz = preg_replace("/[^a-zA-Z0-9_]/", "", $quiz);
-    $student = preg_replace('/[^a-zA-Z0-9 _.-]/', '', $student);
-
-    $file = "/var/www/quiz/result/result_" . $quiz . ".txt";
-
-    if (!file_exists($file)) {
-        $header =
-        "Result - " . strtoupper($quiz) . "\n" .
-        "===============================================================\n" .
-        "Sr  Username        Date                Total Passed Percentage\n" .
-        "----------------------------------------------------------------------------------------------\n";
-
-        file_put_contents($file, $header);
-    }
-
-    $sr = 1;
-
-    if (file_exists($file)) {
-       $lines = file($file, FILE_IGNORE_NEW_LINES);
-       $sr = count($lines) - 3;
-    }
-
-    $line = sprintf(
-        "%-3d %-15s %-19s %-6d %-6d %-10s\n",
-        $sr,
-        $student,
-        $date,
-        $total,
-        $passed,
-        $percent . "%"
-    );
-
-    file_put_contents($file, $line, FILE_APPEND);
-
-    echo "OK";
-    exit;
-}
-
-echo "Invalid action";
 
 [root@server101 ~]# vi /etc/httpd/conf/httpd.conf
 #
