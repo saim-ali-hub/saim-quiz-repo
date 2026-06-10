@@ -18,31 +18,31 @@ if ($action === "save_result") {
     $result_dir = "/var/www/quiz/result/" . $quiz;
 
     if (!is_dir($result_dir)) {
-        mkdir($result_dir, 0755, true);
+        mkdir($result_dir, 0750, true);
     }
 
-    $txt_file = $result_dir . "/result_" . $quiz . ".txt";
-        
-    if (!file_exists($txt_file)) {
+    $file = $result_dir . "/result_" . $quiz . ".txt";
+
+    if (!file_exists($file)) {
         $header =
         "Result - " . strtoupper($quiz) . "\n" .
         "===============================================================\n" .
         "Sr  Username        Date                Total Passed Percentage\n" .
         "---------------------------------------------------------------\n";
 
-        file_put_contents($txt_file, $header);
+        file_put_contents($file, $header);
     }
 
     $sr = 1;
 
-    if (file_exists($txt_file)) {
-       $lines = file($txt_file, FILE_IGNORE_NEW_LINES);
+    if (file_exists($file)) {
+       $lines = file($file, FILE_IGNORE_NEW_LINES);
        $sr = count($lines) - 3;
        $sr = max($sr, 1);
     }
 
     $line = sprintf(
-        "%-3d %-15s %-19s %-6d %-6d %-10s\n",
+        "%-3d %-25s %-22s %-6d %-6d %-10s\n",
         $sr,
         $student,
         $date,
@@ -51,7 +51,7 @@ if ($action === "save_result") {
         $percent . "%"
     );
 
-    file_put_contents($txt_file, $line, FILE_APPEND);
+    file_put_contents($file, $line, FILE_APPEND);
 
     $raw_file = $result_dir . "/result_" . $quiz . ".data";
 
@@ -112,7 +112,7 @@ if ($action === "save_result") {
       $data = explode("|", $row);
       if (count($data) != 5) continue;
       list($user,$dt,$tot,$pass,$pct) = $data;
-      
+
       $html .= "
       <tr>
       <td>$sr</td>
