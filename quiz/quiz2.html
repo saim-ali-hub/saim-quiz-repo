@@ -354,7 +354,7 @@ function sendResultToServer() {
 
     let percent = (correct / questions.length * 100).toFixed(2);
 
-    fetch("http://192.168.111.107:8080/api.php?action=save_result", {
+    fetch("/api.php?action=save_result", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
