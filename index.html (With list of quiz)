@@ -1,0 +1,225 @@
+
+[root@platform html]# cat index.html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Portal</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 450px;
+        }
+
+        h1 {
+            color: #0066cc;
+            font-size: 38px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .start-btn {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .start-btn:hover {
+            background: #004999;
+            transform: scale(1.05);
+        }
+
+        .example-box {
+            margin-top: 25px;
+            padding: 15px;
+            border: 2px solid #0066cc;
+            border-radius: 10px;
+            background: #eef5ff;
+            color: #003366;
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1.8;
+        }
+
+        .logo-container img {
+            width: 120px;
+            margin-bottom: 20px;
+        }
+
+        /* Popup */
+
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+        }
+
+        .popup-content {
+            background: white;
+            width: 420px;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+        }
+
+        .popup-content h2 {
+            color: #0066cc;
+            font-size: 34px;
+            font-weight: bold;
+        }
+
+        .popup-example {
+            background: #eef5ff;
+            border: 2px solid #0066cc;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #003366;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1.8;
+        }
+
+        .popup-content input {
+            width: 90%;
+            padding: 12px;
+            font-size: 20px;
+            border: 2px solid #0066cc;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .popup-content button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .popup-content button:hover {
+            background: #004999;
+        }
+        #quizList{
+           display:flex;
+           flex-direction:column;
+           align-items: flex-start;  /* left align */
+           gap:12px;
+           margin-top:20px;
+        }
+        .quiz-btn {
+            width: 100%;              /* full width = single clean line */
+            text-align: left;         /* text left aligned */
+            padding: 14px 16px;
+            font-size: 18px;
+            border-radius: 8px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .close-btn {
+            background: #999 !important;
+        }
+        .quiz-btn:hover {
+            background: #004999;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="logo-container">
+            <img src="/images/image.png" alt="Logo">
+        </div>
+
+        <h1>Welcome to Quiz Portal</h1>
+
+        <button class="start-btn" onclick="openQuiz()">
+            Start Quiz
+        </button>
+
+    </div>
+
+    <!-- Popup -->
+
+    <div id="quizPopup" class="popup">
+    <div class="popup-content">
+        <div id="quizList"></div>
+        <button onclick="document.getElementById('quizPopup').style.display='none'">
+            Close
+        </button>
+    </div>
+</div>
+
+    <script>
+const quizzes = [
+    {file:"quiz/quiz1", title:"Quiz1 - System Information and Networking Commands"},
+    {file:"quiz/quiz2", title:"Quiz2 - Basic commands & Directory Knowledge"},
+    {file:"quiz/quiz3", title:"Quiz3 - Server Hardware, BIOS, RAID & Ports"},
+    {file:"quiz/quiz4", title:"Quiz4 - Racking & Stacking and iDRAC Configuration"},
+];
+
+function openQuiz() {
+
+     document.getElementById("quizPopup").style.display = "block";
+
+    let html = "";
+
+    quizzes.forEach(q => {
+        html += `
+        <button class="quiz-btn"
+            onclick="startQuiz('${q.file}')">
+            ${q.title}
+        </button>`;
+    });
+
+    document.getElementById("quizList").innerHTML = html;
+}
+
+function startQuiz(quiz){
+    window.location.href = quiz + ".html";
+}
+    </script>
+
+</body>
+
+</html>
