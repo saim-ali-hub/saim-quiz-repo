@@ -1,0 +1,377 @@
+# QUIZ4 – Racking & Stacking and iDRAC Configuration: 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QUIZ4 - Racking & Stacking and iDRAC Configuration</title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ4 – 2026</h2>
+<h1> Racking & Stacking and iDRAC Configuration </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz4";
+
+const questions = [
+{
+q:"Rack and stack mainly involves:",
+options:["Coding applications","Configuring firewall rules","Physical hardware installation in racks","Cloud migration"],
+answer:2
+},
+{
+q:"What is the purpose of server rails?",
+options:["Cooling servers","Connecting network cables","Powering servers","Securing server in rack"],
+answer:3
+},
+{
+q:"Why do servers have dual power supplies?",
+options:["Faster performance","Redundancy","Reduce RAM usage","Improve CPU speed"],
+answer:1
+},
+{
+q:"What does KVM stand for?",
+options:["Kernel Virtual Machine","Knowledge Virtual Module","Keyboard, Video, Mouse","Key Value Manager"],
+answer:2
+},
+{
+q:"In data centers, KVM is used for:",
+options:["Database backup","Controlling multiple servers","Network routing","Cloud storage"],
+answer:1
+},
+{
+q:"A KVM switch allows:",
+options:["Multiple OS installations","Storage encryption","Faster CPU processing","One keyboard/monitor/mouse for many servers"],
+answer:3
+},
+{
+q:"iDRAC is mainly used in:",
+options:["HP servers only","Cisco routers","Dell servers","Linux desktops"],
+answer:2
+},
+{
+q:"First step in configuring iDRAC is:",
+options:["Install OS","Connect iDRAC Ethernet cable","Install VMware","Configure DNS"],
+answer:1
+},
+{
+q:"iDRAC port is used for:",
+options:["Management access","Video output","Storage expansion","Power supply"],
+answer:0
+},
+{
+q:"Which key is pressed to enter iDRAC settings?",
+options:["F12","F1","F2","F10"],
+answer:2
+},
+{
+q:"Which type of IP Address is typically recommended when configuring iDRAC?",
+options:["Dynamic","Static","Ignored","Encrypted"],
+answer:1
+},
+{
+q:"iDRAC requires:",
+options:["Bluetooth connection","Ethernet connection","USB only","WiFi only"],
+answer:1
+},
+{
+q:"iDRAC can be used for:",
+options:["Remote management","Gaming","Email hosting","File compression"],
+answer:0
+},
+{
+q:"Which is NOT part of rack and stack?",
+options:["Cable management","Installing rails","Writing application code","Power connection"],
+answer:2
+},
+{
+q:"Which device is commonly used for shared server access?",
+options:["Router","KVM switch","Firewall","Switch port"],
+answer:1
+},
+{
+q:"iDRAC can help with:",
+options:["Hardware monitoring","Video editing","Coding apps","Browsing internet"],
+answer:0
+},
+{
+q:"Main goal of rack and stack is:",
+options:["Software development","Prepare hardware for production","Create virtual machines","Design websites"],
+answer:1
+},
+{
+q:"After mounting server, next step is:",
+options:["Install antivirus","Connect power supplies and cables","Install OS","Create users"],
+answer:1
+},
+{
+q:"PDUs are used for:",
+options:["Storage","Power distribution","Networking","Monitoring CPU"],
+answer:1
+},
+{
+q:"Which power connection method is recommended for redundancy?",
+options:["Single PDU","Separate PDUs","No power supply","USB power"],
+answer:1
+}
+];
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>
