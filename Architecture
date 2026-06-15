@@ -15,6 +15,17 @@ drwxr-x---. 5 apache apache 45 Jun 10 01:14 result/
 drwxr-xr-x. 2 apache apache 112 Jun 10 03:25 quiz1
 drwxr-xr-x. 2 apache apache   6 Jun 10 01:14 quiz2
 drwxr-xr-x. 2 apache apache 112 Jun 10 02:04 quiz3
+drwxr-xr-x. 2 apache apache 4096 Jun 14 15:47 quiz4
+drwxr-xr-x. 2 apache apache 4096 Jun 14 19:57 quiz5
+
+[root@platform result]# ls -l quiz1
+-rw-r--r--. 1 apache apache  3315 Jun 15 19:16 result_quiz1.data
+-rw-r--r--. 1 apache apache 13882 Jun 15 19:16 result_quiz1.html
+-rw-r--r--. 1 root   root    1123 Jun 13 20:02 result_quiz1_sorted.csv
+-rw-r--r--. 1 apache apache  8355 Jun 15 19:16 result_quiz1_sorted.html
+-rw-r--r--. 1 root   root    1965 Jun 13 20:02 result_quiz1_sorted.txt
+-rw-r--r--. 1 apache apache  6096 Jun 15 19:16 result_quiz1.txt
+-rwxr-xr-x. 1 root   root    1656 Jun 13 20:01 script_sorting.sh
 
 [root@platform html]# ls -ld /var/www/html
 drwxr-xr-x. 3 apache apache root 38 Jun  8 21:27 .
