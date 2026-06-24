@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QUIZ7 – VMware Virtualization Fundamentals</title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ7 – 2026</h2>
+<h1> VMware Virtualization Fundamentals </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz7";
+
+const questions = [
+{
+q:"What is the primary purpose of virtualization?",
+options:["Increase monitor resolution","Run multiple virtual machines on a single physical server","Replace networking","Increase internet speed"],
+answer:1
+},
+{
+q:"What is a hypervisor?",
+options:["A physical server","A network switch","Software that allows virtual machines to run","A storage device"],
+answer:2
+},
+{
+q:"Which VMware product is a Type-1 hypervisor?",
+options:["vCenter","vSphere","ESXi","Workstation"],
+answer:2
+},
+{
+q:"Where is ESXi installed?",
+options:["Inside Windows","Inside Linux","Directly on bare metal hardware","Inside a virtual machine"],
+answer:2
+},
+{
+q:"What is a virtual machine (VM)?",
+options:["A software-based computer","A physical server","A network cable","A storage array"],
+answer:0
+},
+{
+q:"Another name for a virtual machine is:",
+options:["Host Machine","Guest VM","Physical Node","Bare Metal Server"],
+answer:1
+},
+{
+q:"What is the host in a VMware environment?",
+options:["The virtual machine","The physical server running ESXi","The storage array","The network switch"],
+answer:1
+},
+{
+q:"What is the primary purpose of vCenter?",
+options:["Install Linux","Manage multiple ESXi hosts centrally","Create physical servers","Manage printers"],
+answer:1
+},
+{
+q:"Which component provides centralized management for VMware infrastructure?",
+options:["ESXi","VM","vCenter","RAID"],
+answer:2
+},
+{
+q:"In a VMware environment, each ESXi host must have:",
+options:["The same hostname","A unique IP address","A unique operating system","A dedicated monitor"],
+answer:1
+},
+{
+q:"What does a hypervisor host?",
+options:["Network switches","Virtual machines","Storage arrays","Firewalls"],
+answer:1
+},
+{
+q:"What does the physical server host directly?",
+options:["Virtual machines","vCenter","ESXi hypervisor","Windows"],
+answer:2
+},
+{
+q:"Which VMware component is used by administrators to create and manage VMs?",
+options:["vCenter","RAID Controller","BIOS","iDRAC"],
+answer:0
+},
+{
+q:"What is the relationship between Host and Guest?",
+options:["Guest hosts the Host","Host runs inside Guest","Host runs ESXi and Guest VMs run on top of it","They are unrelated"],
+answer:2
+},
+{
+q:"Which term refers to the complete VMware virtualization platform and ecosystem?",
+options:["ESXi","vSphere","RAID","CMOS"],
+answer:1
+},
+{
+q:"Which of the following resources can be allocated to a virtual machine?",
+options:["vCPU","vRAM","Virtual Disk","All of the above"],
+answer:3
+},
+{
+q:"What problem does virtualization primarily solve for organizations?",
+options:["Increasing monitor size","Reducing hardware utilization","Improving hardware utilization and reducing costs","Replacing operating systems"],
+answer:2
+},
+{
+q:"Without vCenter, how are ESXi hosts typically managed?",
+options:["Through a network switch","Individually","Using RAID","Using BIOS"],
+answer:1
+},
+{
+q:"Which VMware component acts as the foundation for running virtual machines?",
+options:["vCenter","Guest OS","ESXi Hypervisor","vSphere Client"],
+answer:2
+},
+{
+q:"In a VMware environment, multiple virtual machines can share the same:",
+options:["Physical server resources","Operating system installation","Hostname","IP address"],
+answer:0
+}
+];
+
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>
