@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QUIZ9 – AWS & Cloud Computing </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 9 – 2026</h2>
+<h1> AWS & Cloud Computing </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz9";
+const questions = [
+{
+q:"Before cloud computing, where did most companies keep their IT infrastructure?",
+options:[
+"AWS Regions",
+"Local data centers",
+"Public cloud providers",
+"Edge locations"
+],
+answer:1
+},
+{
+q:"One major disadvantage of traditional data centers was:",
+options:[
+"Unlimited scalability",
+"Low infrastructure cost",
+"High infrastructure cost and maintenance",
+"Automatic backups"
+],
+answer:2
+},
+{
+q:"Traditional infrastructure generally had:",
+options:[
+"High redundancy and no downtime",
+"Very little redundancy and longer downtime",
+"Unlimited storage",
+"Automatic scaling"
+],
+answer:1
+},
+{
+q:"Before cloud computing, organizations were responsible for:",
+options:[
+"Only software installation",
+"Only networking",
+"Data backups, encryption, and security requirements",
+"AWS billing"
+],
+answer:2
+},
+{
+q:"Traditional infrastructure was considered:",
+options:[
+"Highly flexible",
+"Dynamic and automated",
+"Static and difficult to modify",
+"Fully serverless"
+],
+answer:2
+},
+{
+q:"Which cloud computing model provides virtual infrastructure?",
+options:[
+"SaaS",
+"PaaS",
+"IaaS",
+"DBaaS"
+],
+answer:2
+},
+{
+q:"Which cloud computing model provides a platform for developers to build applications?",
+options:[
+"IaaS",
+"PaaS",
+"SaaS",
+"DaaS"
+],
+answer:1
+},
+{
+q:"Which cloud computing model delivers ready-to-use software over the internet?",
+options:[
+"IaaS",
+"PaaS",
+"SaaS",
+"FaaS"
+],
+answer:2
+},
+{
+q:"An Availability Zone (AZ) consists of:",
+options:[
+"One data center only",
+"Two or more data centers",
+"One AWS Region",
+"Multiple AWS accounts"
+],
+answer:1
+},
+{
+q:"The primary purpose of an Availability Zone is:",
+options:[
+"Billing customers",
+"Fault tolerance and high availability",
+"Software licensing",
+"User authentication"
+],
+answer:1
+},
+{
+q:"An AWS Region consists of:",
+options:[
+"One Availability Zone",
+"Two or more Availability Zones",
+"One Edge Location",
+"One data center only"
+],
+answer:1
+},
+{
+q:"Customers usually choose the nearest AWS Region to:",
+options:[
+"Increase storage cost",
+"Reduce latency",
+"Increase downtime",
+"Reduce security"
+],
+answer:1
+},
+{
+q:"Data can be replicated between:",
+options:[
+"Edge Locations only",
+"Data centers only",
+"AWS Regions",
+"User devices only"
+],
+answer:2
+},
+{
+q:"AWS Edge Locations are mainly used to:",
+options:[
+"Store customer backups only",
+"Reduce latency through caching",
+"Host virtual machines",
+"Create Availability Zones"
+],
+answer:1
+},
+{
+q:"AWS Edge Locations are best described as:",
+options:[
+"Database servers",
+"Caching data centers",
+"Customer offices",
+"Development environments"
+],
+answer:1
+},
+{
+q:"Cloud computing can be defined as:",
+options:[
+"Managing only local servers",
+"Infrastructure provided as a service over the internet",
+"Building physical data centers",
+"Manufacturing servers"
+],
+answer:1
+},
+{
+q:"One major benefit of cloud computing is:",
+options:[
+"Increased IT operational costs",
+"Huge reduction in IT operations",
+"Increased hardware purchases",
+"Longer deployment times"
+],
+answer:1
+},
+{
+q:"Which deployment model is owned and managed by a single organization?",
+options:[
+"Public Cloud",
+"Hybrid Cloud",
+"Private Cloud",
+"Multi-Cloud"
+],
+answer:2
+},
+{
+q:"Which deployment model provides cloud services over the internet to multiple customers?",
+options:[
+"Private Cloud",
+"Hybrid Cloud",
+"Public Cloud",
+"Community Cloud"
+],
+answer:2
+},
+{
+q:"Which deployment model combines private and public cloud environments?",
+options:[
+"Edge Cloud",
+"Hybrid Cloud",
+"Public Cloud",
+"Private Cloud"
+],
+answer:1
+}
+];
+
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>
