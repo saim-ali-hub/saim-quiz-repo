@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QUIZ8 – Introduction to Cloud </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 8 – 2026</h2>
+<h1> Introduction to cloud </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz8";
+const questions = [
+{
+q:"Which of the following best describes cloud computing?",
+options:[
+"Running applications only on a personal computer",
+"Delivering IT resources over the internet on demand",
+"Storing data only on local hard drives",
+"Using physical servers without virtualization"
+],
+answer:1
+},
+{
+q:"Which pricing model was repeatedly emphasized during the session?",
+options:[
+"Fixed monthly subscription",
+"Lifetime license",
+"Pay-as-you-go",
+"Annual contract only"
+],
+answer:2
+},
+{
+q:"In the Black Friday example, why is cloud computing considered the best solution?",
+options:[
+"It provides free servers.",
+"It permanently adds more hardware.",
+"Businesses only pay for additional resources when needed.",
+"It eliminates internet usage."
+],
+answer:2
+},
+{
+q:"What happens to extra cloud resources after the temporary demand is over?",
+options:[
+"They remain allocated forever.",
+"They are automatically destroyed, and you stop paying for them.",
+"They become physical servers.",
+"They are transferred to another company."
+],
+answer:1
+},
+{
+q:"Why does Netflix prefer using cloud services instead of building its own data centers?",
+options:[
+"It cannot afford servers.",
+"Time and speed are more valuable than building infrastructure.",
+"AWS owns Netflix.",
+"Netflix does not use virtualization."
+],
+answer:1
+},
+{
+q:"What is the biggest advantage cloud provides during temporary traffic spikes?",
+options:[
+"Free networking",
+"Unlimited storage",
+"On-demand scalability",
+"Faster CPUs only"
+],
+answer:2
+},
+{
+q:"What technology forms the foundation of cloud providers like AWS?",
+options:[
+"Blockchain",
+"Artificial Intelligence",
+"Virtualization",
+"DNS"
+],
+answer:2
+},
+{
+q:"Which concept is included in cloud economics?",
+options:[
+"Static IP addressing",
+"Pricing flexibility",
+"BIOS configuration",
+"PXE boot"
+],
+answer:1
+},
+{
+q:"Which feature ensures services continue running even if part of the infrastructure fails?",
+options:[
+"RAID",
+"High Availability",
+"NAT",
+"DHCP"
+],
+answer:1
+},
+{
+q:"Does AWS have a limit to its capacity?",
+options:[
+"No, it is infinite.",
+"Yes, but it is so large that reaching it would take years.",
+"AWS only supports 100 servers.",
+"It depends on the operating system."
+],
+answer:1
+},
+{
+q:"Do AWS employees freely access customer data?",
+options:[
+"Yes, at any time.",
+"Only administrators can.",
+"No, customer data is protected through strict policies and encryption.",
+"Only during maintenance."
+],
+answer:2
+},
+{
+q:"Which feature of cloud computing allows businesses to quickly increase or decrease computing resources based on demand?",
+options:[
+"Fault tolerance",
+"Scalability",
+"Encryption",
+"Replication"
+],
+answer:1
+},
+{
+q:"Which of the following is a financial advantage of using AWS?",
+options:[
+"Purchasing expensive hardware upfront",
+"Paying only for the resources you use",
+"Signing long-term contracts before using services",
+"Maintaining your own physical data center"
+],
+answer:1
+},
+{
+q:"Which of the following is NOT a major cloud service provider?",
+options:[
+"Amazon Web Services (AWS)",
+"Microsoft Azure",
+"Google Cloud Platform (GCP)",
+"Red Hat Enterprise Linux (RHEL)"
+],
+answer:3
+},
+{
+q:"What is the primary purpose of virtualization in cloud computing?",
+options:[
+"To replace the internet",
+"To run multiple virtual machines on a single physical server",
+"To permanently increase storage capacity",
+"To eliminate operating systems"
+],
+answer:1
+},
+{
+q:"Which AWS pricing model helps organizations reduce infrastructure costs?",
+options:[
+"One-time license purchase",
+"Pay-as-you-go pricing",
+"Lifetime subscription",
+"Fixed hardware investment"
+],
+answer:1
+},
+{
+q:"Which AWS feature enables applications to handle sudden increases in user traffic?",
+options:[
+"Manual hardware upgrades",
+"Elastic scalability",
+"Static resource allocation",
+"Dedicated desktop computers"
+],
+answer:1
+},
+{
+q:"Why do organizations choose AWS instead of building their own data centers?",
+options:[
+"AWS does not require internet connectivity.",
+"AWS provides on-demand, scalable infrastructure without large upfront hardware investments.",
+"AWS only supports Linux operating systems.",
+"AWS eliminates the need for cybersecurity."
+],
+answer:1
+},
+{
+q:"Which of the following is a benefit of cloud computing compared to traditional on-premises infrastructure?",
+options:[
+"Longer hardware procurement time",
+"Faster deployment of applications and services",
+"Mandatory purchase of physical servers",
+"Fixed resource capacity"
+],
+answer:1
+},
+{
+q:"Which AWS concept refers to designing systems that continue operating despite component failures?",
+options:[
+"Elasticity",
+"High Availability",
+"Virtualization",
+"Billing"
+],
+answer:1
+}
+];
+
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>
