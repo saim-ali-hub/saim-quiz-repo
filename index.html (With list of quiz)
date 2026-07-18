@@ -1,5 +1,3 @@
-
-[root@platform html]# cat index.html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -86,11 +84,14 @@
         .popup-content {
             background: white;
             width: 420px;
-            margin: 10% auto;
+            max-height: 80vh;
+            margin: 5% auto;
             padding: 30px;
             border-radius: 15px;
             text-align: center;
             box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+            display:flex;
+            overflow: hidden;
         }
 
         .popup-content h2 {
@@ -141,6 +142,21 @@
            align-items: flex-start;  /* left align */
            gap:12px;
            margin-top:20px;
+           max-height:60vh;
+           overflow-y:auto;
+           padding-right:10px;
+        }
+        #quizList::-webkit-scrollbar {
+        width: 8px;
+        }
+
+        #quizList::-webkit-scrollbar-thumb {
+        background: #0066cc;
+        border-radius: 10px;
+        }
+
+        #quizList::-webkit-scrollbar-track {
+        background: #eef5ff;
         }
         .quiz-btn {
             width: 100%;              /* full width = single clean line */
@@ -184,7 +200,7 @@
     <div id="quizPopup" class="popup">
     <div class="popup-content">
         <div id="quizList"></div>
-        <button onclick="document.getElementById('quizPopup').style.display='none'">
+        <button class="close-btn" onclick="document.getElementById('quizPopup').style.display='none'">
             Close
         </button>
     </div>
@@ -196,6 +212,11 @@ const quizzes = [
     {file:"quiz/quiz2", title:"Quiz2 - Basic commands & Directory Knowledge"},
     {file:"quiz/quiz3", title:"Quiz3 - Server Hardware, BIOS, RAID & Ports"},
     {file:"quiz/quiz4", title:"Quiz4 - Racking & Stacking and iDRAC Configuration"},
+    {file:"quiz/quiz5", title:"Quiz5 - Networking, BIOS & RAID"},
+    {file:"quiz/quiz6", title:"Quiz6 - Linux, SSH & Virtualization"},
+    {file:"quiz/quiz7", title:"Quiz7 - VMware Virtualization Fundamentals"},
+    {file:"quiz/quiz8", title:"Quiz8 - Introduction to Cloud"},
+    {file:"quiz/quiz9", title:"Quiz9 - AWS & Cloud Computing"},
 ];
 
 function openQuiz() {
