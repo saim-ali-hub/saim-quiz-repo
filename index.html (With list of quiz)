@@ -217,6 +217,7 @@ const quizzes = [
     {file:"quiz/quiz7", title:"Quiz7 - VMware Virtualization Fundamentals"},
     {file:"quiz/quiz8", title:"Quiz8 - Introduction to Cloud"},
     {file:"quiz/quiz9", title:"Quiz9 - AWS & Cloud Computing"},
+    {file:"quiz/quiz10", title:"Quiz10 - Hierarchy of AWS Global Infrastructure"},
 ];
 
 function openQuiz() {
