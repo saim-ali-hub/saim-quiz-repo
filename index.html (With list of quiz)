@@ -218,6 +218,9 @@ const quizzes = [
     {file:"quiz/quiz8", title:"Quiz8 - Introduction to Cloud"},
     {file:"quiz/quiz9", title:"Quiz9 - AWS & Cloud Computing"},
     {file:"quiz/quiz10", title:"Quiz10 - Hierarchy of AWS Global Infrastructure"},
+    {file:"quiz/quiz11", title:"Quiz 11 - AWS Billing, CloudWatch & EC2 Fundamentals"},
+    {file:"quiz/quiz12", title:"Quiz 12 - AWS IAM & MFA"},
+    {file:"quiz/quiz13", title:"Quiz 13 - AWS S3 Storage"},
 ];
 
 function openQuiz() {
