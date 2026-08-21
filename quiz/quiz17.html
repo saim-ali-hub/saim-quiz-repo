@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title> Quiz17 – Tape Archive </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 17 – 2026</h2>
+<h1> Tape Archive (TAR) </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz17";
+const questions = [
+
+{
+
+q:"What does TAR stand for?",
+
+options:[
+
+"Transfer Archive",
+
+"Tape Archive",
+
+"Temporary Archive",
+
+"Terminal Archive"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which TAR option is used to create a new archive?",
+
+options:[
+
+"-r",
+
+"-t",
+
+"-x",
+
+"-c"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"What does the -t option in tar -tf archive.tar do?",
+
+options:[
+
+"Transfers the archive",
+
+"Temporarily extracts the archive",
+
+"Tests the archive",
+
+"Lists the contents of the archive"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command correctly extracts project.tar?",
+
+options:[
+
+"tar -xf project.tar",
+
+"tar -cf project.tar",
+
+"tar -tf project.tar",
+
+"tar -rf project.tar"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"What does the -f option in a TAR command specify?",
+
+options:[
+
+"Filesystem type",
+
+"File permissions",
+
+"Force mode",
+
+"File name of the archive"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command creates a gzip-compressed TAR archive named company.tar.gz?",
+
+options:[
+
+"tar -cJf company.tar.gz company/",
+
+"tar -ctf company.tar.gz company/",
+
+"tar -cjf company.tar.gz company/",
+
+"tar -czf company.tar.gz company/"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command lists the contents of a gzip-compressed archive named backup.tar.gz?",
+
+options:[
+
+"tar -tjf backup.tar.gz",
+
+"tar -czf backup.tar.gz",
+
+"tar -tzf backup.tar.gz",
+
+"tar -xzf backup.tar.gz"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"What is the primary difference between archiving and compression?",
+
+options:[
+
+"Archiving encrypts files; compression deletes duplicates",
+
+"Archiving changes permissions; compression changes ownership",
+
+"Archiving combines files; compression reduces data size",
+
+"Archiving extracts files; compression lists files"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"What does tar -xf archive.tar -C /tmp/restore do?",
+
+options:[
+
+"Compresses the archive into /tmp/restore",
+
+"Creates the archive in /tmp/restore",
+
+"Extracts the archive into /tmp/restore",
+
+"Lists the archive from /tmp/restore"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command creates a bzip2-compressed TAR archive?",
+
+options:[
+
+"tar -cJf backup.tar.bz2 data/",
+
+"tar -czf backup.tar.bz2 data/",
+
+"tar -cjf backup.tar.bz2 data/",
+
+"tar -ctf backup.tar.bz2 data/"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command creates an xz-compressed TAR archive?",
+
+options:[
+
+"tar -czf backup.tar.xz data/",
+
+"tar -cJf backup.tar.xz data/",
+
+"tar -cjf backup.tar.xz data/",
+
+"tar -cxf backup.tar.xz data/"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command appends newfile.txt to an existing uncompressed archive named backup.tar?",
+
+options:[
+
+"tar -czf backup.tar newfile.txt",
+
+"tar -rf backup.tar newfile.txt",
+
+"tar -tf backup.tar newfile.txt",
+
+"tar -xf backup.tar newfile.txt"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"What does tar -tvf archive.tar provide?",
+
+options:[
+
+"Creation of a verbose archive",
+
+"A detailed listing of archive contents",
+
+"Compression using verbose mode",
+
+"Extraction with permissions preserved"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command displays the contents of backup.tar without extracting it?",
+
+options:[
+
+"tar -xf backup.tar",
+
+"tar -cf backup.tar",
+
+"tar -tf backup.tar",
+
+"tar -rf backup.tar"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which TAR option represents bzip2 compression?",
+
+options:[
+
+"-z",
+
+"-j",
+
+"-J",
+
+"-b"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"You have company.tar containing company/reports/ and company/images/. Which command extracts only the company/images/ directory?",
+
+options:[
+
+"tar -rf company.tar company/images/",
+
+"tar -xf company.tar company/restore/",
+
+"tar -xf company.tar company/images/",
+
+"tar -rf company.tar company/images/"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"What does the uppercase -C option commonly do in a TAR extraction command?",
+
+options:[
+
+"Compresses the archive",
+
+"Creates a new archive",
+
+"Changes the working directory for the TAR operation",
+
+"Checks the archive"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command creates a normal, uncompressed TAR archive of /etc/myapp?",
+
+options:[
+
+"tar -xf myapp.tar /etc/myapp",
+
+"tar -cf myapp.tar /etc/myapp",
+
+"tar -tf myapp.tar /etc/myapp",
+
+"tar -xzf myapp.tar /etc/myapp"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"What is the main purpose of gzip when used with TAR?",
+
+options:[
+
+"To list archive contents",
+
+"To preserve directory ownership",
+
+"To extract individual files",
+
+"To compress the archive data"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"An administrator wants to create a compressed backup of /var/www/html using gzip. Which command is appropriate?",
+
+options:[
+
+"tar -xzf website.tar.gz /var/www/html",
+
+"tar -tjf website.tar.gz /var/www/html",
+
+"tar -czf website.tar.gz /var/www/html",
+
+"tar -cJf website.tar.gz /var/www/html"
+
+],
+answer:2
+}
+];
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>
+

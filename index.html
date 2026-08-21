@@ -84,11 +84,14 @@
         .popup-content {
             background: white;
             width: 420px;
-            margin: 10% auto;
+            max-height: 80vh;
+            margin: 5% auto;
             padding: 30px;
             border-radius: 15px;
             text-align: center;
             box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+            display:flex;
+            overflow: hidden; 
         }
 
         .popup-content h2 {
@@ -133,11 +136,46 @@
         .popup-content button:hover {
             background: #004999;
         }
+        #quizList{
+           display:flex;
+           flex-direction:column;
+           align-items: flex-start;  /* left align */
+           gap:12px;
+           margin-top:20px;
+           max-height:60vh;
+           overflow-y:auto;
+           padding-right:10px; 
+        }
+        #quizList::-webkit-scrollbar {
+ 	width: 8px;
+	}
 
+	#quizList::-webkit-scrollbar-thumb {
+	background: #0066cc;
+	border-radius: 10px;
+	}
+
+	#quizList::-webkit-scrollbar-track {
+	background: #eef5ff;
+	}
+        .quiz-btn {
+            width: 100%;              /* full width = single clean line */
+            text-align: left;         /* text left aligned */
+            padding: 14px 16px;
+            font-size: 18px;
+            border-radius: 8px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
         .close-btn {
             background: #999 !important;
         }
-
+        .quiz-btn:hover {
+            background: #004999;
+        }
     </style>
 </head>
 
@@ -160,60 +198,55 @@
     <!-- Popup -->
 
     <div id="quizPopup" class="popup">
-
-        <div class="popup-content">
-
-            <h2>Enter Quiz Name</h2>
-
-            <div class="popup-example">
-                Example:<br>
-                quiz/quiz1<br>
-                quiz/quiz2<br>
-                quiz/quiz3
-            </div>
-
-            <input type="text" id="quizInput" placeholder="Input quiz number like  quiz/quiz1">
-
-            <br><br>
-
-            <button onclick="goQuiz()">
-                Open Quiz
-            </button>
-
-            <button onclick="closePopup()" class="close-btn">
-                Cancel
-            </button>
-
-        </div>
-
+    <div class="popup-content">
+        <div id="quizList"></div>
+        <button class="close-btn" onclick="document.getElementById('quizPopup').style.display='none'">
+            Close
+        </button>
     </div>
+</div>
 
     <script>
+const quizzes = [
+    {file:"quiz/quiz1", title:"Quiz1 - System Information and Networking Commands"},
+    {file:"quiz/quiz2", title:"Quiz2 - Basic commands & Directory Knowledge"},
+    {file:"quiz/quiz3", title:"Quiz3 - Server Hardware, BIOS, RAID & Ports"},
+    {file:"quiz/quiz4", title:"Quiz4 - Racking & Stacking and iDRAC Configuration"},
+    {file:"quiz/quiz5", title:"Quiz5 - Networking, BIOS & RAID"},
+    {file:"quiz/quiz6", title:"Quiz6 - Linux, SSH & Virtualization"},
+    {file:"quiz/quiz7", title:"Quiz7 - VMware Virtualization Fundamentals"}, 
+    {file:"quiz/quiz8", title:"Quiz8 - Introduction to Cloud"}, 
+    {file:"quiz/quiz9", title:"Quiz9 - AWS & Cloud Computing"}, 
+    {file:"quiz/quiz10", title:"Quiz10 - Hierarchy of AWS Global Infrastructure"}, 
+    {file:"quiz/quiz11", title:"Quiz 11 - AWS Billing, CloudWatch & EC2 Fundamentals"}, 
+    {file:"quiz/quiz12", title:"Quiz 12 - AWS IAM & MFA"}, 
+    {file:"quiz/quiz13", title:"Quiz 13 - AWS S3 Storage"}, 
+    {file:"quiz/quiz14", title:"Quiz 14 - Linux Filesystem"}, 
+    {file:"quiz/quiz15", title:"Quiz 15 - Linux Basic Commands"},
+    {file:"quiz/quiz16", title:"Quiz 16 - Linux Link Management"}, 
+    {file:"quiz/quiz17", title:"Quiz 17 - Tape Archive (TAR)"}, 
+];
 
-        function openQuiz() {
-            document.getElementById("quizPopup").style.display = "block";
-        }
+function openQuiz() {
+    
+     document.getElementById("quizPopup").style.display = "block";
 
-        function closePopup() {
-            document.getElementById("quizPopup").style.display = "none";
-        }
+    let html = "";
 
-        function goQuiz() {
+    quizzes.forEach(q => {
+        html += `
+        <button class="quiz-btn"
+            onclick="startQuiz('${q.file}')">
+            ${q.title}
+        </button>`;
+    });
 
-            let quiz = document.getElementById("quizInput").value;
+    document.getElementById("quizList").innerHTML = html;
+}
 
-            quiz = quiz.toLowerCase().trim();
-
-            const pattern = /^quiz\/quiz[1-9][0-9]*$/;
-
-            if (!pattern.test(quiz)) {
-                alert("Invalid format! Use quiz/quiz1, quiz/quiz2...");
-                return;
-            }
-
-            window.location.href = quiz + ".html";
-        }
-
+function startQuiz(quiz){
+    window.location.href = quiz + ".html";
+}
     </script>
 
 </body>
