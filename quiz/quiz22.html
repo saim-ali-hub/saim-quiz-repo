@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title> Quiz22 – Linux User Management </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 22 – 2026</h2>
+<h1> Linux User Management </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz22";
+const questions = [
+
+{
+
+q:"Which command creates a new Linux user named analyst using the default settings?",
+
+options:[
+
+"usermod analyst",
+
+"useradd analyst",
+
+"usercreate analyst",
+
+"addgroup analyst"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which option to useradd specifies a particular UID for a new user?",
+
+options:[
+
+"-u",
+
+"-d",
+
+"-G",
+
+"-g"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which command creates user trainee with UID 2500?",
+
+options:[
+
+"usermod -u 2500 trainee",
+
+"useradd -u 2500 trainee",
+
+"useradd -d 2500 trainee",
+
+"useradd -g 2500 trainee"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"What does the -g option of useradd specify?",
+
+options:[
+
+"Login shell",
+
+"Initial primary group",
+
+"Home directory",
+
+"Supplementary groups"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which useradd option assigns a user to one or more supplementary groups?",
+
+options:[
+
+"-G",
+
+"-g",
+
+"-U",
+
+"-u"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which command creates user alice with developers and testers as supplementary groups?",
+
+options:[
+
+"useradd -u developers,testers alice",
+
+"useradd -g developers,testers alice",
+
+"useradd -G developers,testers alice",
+
+"usermod -G developers,testers alice"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which file contains the primary local user account information, including usernames and UIDs?",
+
+options:[
+
+"/etc/shadow",
+
+"/etc/passwd",
+
+"/etc/group",
+
+"/etc/login.defs"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command displays the UID, primary GID, and supplementary groups for the current user?",
+
+options:[
+
+"groupsadd",
+
+"whoami",
+
+"id",
+
+"passwd -S"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command adds alice to the supplementary group docker without removing her existing supplementary groups?",
+
+options:[
+
+"usermod -G docker alice",
+
+"usermod -g docker alice",
+
+"usermod -aG docker alice",
+
+"groupmod -a docker alice"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"What is the main risk of running usermod -G docker alice when alice already belongs to several supplementary groups?",
+
+options:[
+
+"Alice's password is deleted",
+
+"Alice's home directory is removed",
+
+"Alice's UID is changed",
+
+"Existing supplementary groups are replaced"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command locks the password-based login for user analyst?",
+
+options:[
+
+"passwd -l analyst",
+
+"userdel -l analyst",
+
+"usermod -U analyst",
+
+"passwd -u analyst"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which command unlocks a previously locked user's password?",
+
+options:[
+
+"passwd -l analyst",
+
+"userdel -u analyst",
+
+"usermod -L analyst",
+
+"passwd -u analyst"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command changes the password for user analyst?",
+
+options:[
+
+"passwd analyst",
+
+"groupmod analyst",
+
+"useradd -p analyst",
+
+"usermod -p analyst"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which command removes the user account analyst while also removing the user's home directory?",
+
+options:[
+
+"usermod -r analyst",
+
+"groupdel -r analyst",
+
+"userdel analyst",
+
+"userdel -r analyst"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command temporarily prevents user analyst from logging in by locking the account password?",
+
+options:[
+
+"usermod -d analyst",
+
+"usermod -U analyst",
+
+"usermod -L analyst",
+
+"groupmod -L analyst"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command creates a new group named developers?",
+
+options:[
+
+"groupadd developers",
+
+"usermod -G developers",
+
+"useradd developers",
+
+"groupmod developers"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which option to groupadd assigns GID 3005 to a new group named developers?",
+
+options:[
+
+"groupadd -g 3005 developers",
+
+"groupadd -u 3005 developers",
+
+"groupadd -G 3005 developers",
+
+"groupmod -g 3005 developers"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which command removes an existing group named oldgroup?",
+
+options:[
+
+"groupdel oldgroup",
+
+"usermod -r oldgroup",
+
+"userdel oldgroup",
+
+"groupmod -r oldgroup"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which command shows the groups to which user analyst belongs?",
+
+options:[
+
+"groupdel analyst",
+
+"groups analyst",
+
+"passwd analyst",
+
+"groupadd analyst"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"What does the third field in an /etc/passwd entry represent?",
+
+options:[
+
+"User ID (UID)",
+
+"Primary group ID (GID)",
+
+"Login shell",
+
+"Home directory"
+
+],
+
+answer:0
+
+}
+
+];
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>

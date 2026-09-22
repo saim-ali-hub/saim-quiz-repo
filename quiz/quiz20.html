@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title> Quiz20 – Linux Process Management </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 20 – 2026</h2>
+<h1> Linux Process Management </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz20";
+const questions = [
+
+{
+
+q:"Which command displays a snapshot of all processes running on a Linux system, including processes owned by other users?",
+
+options:[
+
+"ps -u",
+
+"ps -f",
+
+"ps -ef",
+
+"ps -x"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"What does the PID of a process represent?",
+
+options:[
+
+"The process's parent identifier",
+
+"The process's terminal identifier",
+
+"The process's priority value",
+
+"The process's unique identifier"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command is most appropriate for finding the PID of a process named sleep?",
+
+options:[
+
+"pid sleep",
+
+"pgrep sleep",
+
+"find sleep /proc",
+
+"grep sleep /proc"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"What does pgrep -u \"$USER\" -x sleep do?",
+
+options:[
+
+"Kills all sleep processes owned by the current user",
+
+"Starts sleep as the current user",
+
+"Finds exact sleep processes owned by the current user",
+
+"Finds any process containing sleep in its command line"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"A shell starts sleep 300 &. What does the & do?",
+
+options:[
+
+"Runs sleep as a daemon permanently",
+
+"Automatically increases the process priority",
+
+"Starts sleep as a background job",
+
+"Runs sleep with root privileges"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command displays the shell's current background and stopped jobs?",
+
+options:[
+
+"joblist",
+
+"psjobs",
+
+"procjobs",
+
+"jobs"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"A running foreground process is suspended with Ctrl+Z. Which command resumes job number 1 in the background?",
+
+options:[
+
+"bg %1",
+
+"resume %1",
+
+"fg %1",
+
+"run %1"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which command brings shell job number 1 from the background to the foreground?",
+
+options:[
+
+"attach %1",
+
+"bg %1",
+
+"fg %1",
+
+"front %1"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which signal is normally sent by kill PID when no signal is explicitly specified?",
+
+options:[
+
+"SIGKILL",
+
+"SIGSTOP",
+
+"SIGTERM",
+
+"SIGHUP"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Why is SIGKILL different from SIGTERM?",
+
+options:[
+
+"SIGKILL changes the process to background mode",
+
+"SIGKILL always gives the process time to clean up",
+
+"SIGKILL cannot be caught or ignored by the target process",
+
+"SIGKILL only works on stopped processes"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"What does the PPID field shown by ps identify?",
+
+options:[
+
+"The process's CPU percentage",
+
+"The process's priority",
+
+"The process's terminal number",
+
+"The process's parent PID"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command is designed to display processes in a tree-like parent-child hierarchy?",
+
+options:[
+
+"treeproc",
+
+"pstree",
+
+"proctree",
+
+"psparent"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"What is the main purpose of nice when starting a process?",
+
+options:[
+
+"To change the process owner",
+
+"To assign a scheduling niceness value",
+
+"To move a process to another terminal",
+
+"To assign a permanent PID"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command changes the niceness value of an already running process?",
+
+options:[
+
+"renice",
+
+"nice",
+
+"setnice",
+
+"repriority"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"What is a zombie process?",
+
+options:[
+
+"A process that is consuming all available CPU",
+
+"A process sleeping indefinitely",
+
+"A terminated process whose parent has not yet collected its exit status",
+
+"A process running with negative niceness"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command can terminate processes by matching their names rather than requiring you to supply a PID?",
+
+options:[
+
+"killname",
+
+"pkill",
+
+"pstop",
+
+"procend"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command is useful for interactively monitoring CPU and memory usage of running processes?",
+
+options:[
+
+"tee",
+
+"touch",
+
+"top",
+
+"tar"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command displays a process's PID, PPID, state, and command name in a compact format?",
+
+options:[
+
+"ps -x pid pp state comm",
+
+"pstree -o pid,ppid,state",
+
+"ps --tree pid ppid",
+
+"ps -o pid,ppid,state,comm"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command sends SIGTERM explicitly to PID 4321?",
+
+options:[
+
+"kill -9 4321",
+
+"kill -15 4321",
+
+"kill -19 4321",
+
+"kill -20 4321"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command finds processes owned by user student whose exact process name is bash?",
+
+options:[
+
+"pgrep -x student bash",
+
+"pgrep -n student bash",
+
+"pgrep -u student -x bash",
+
+"pgrep -f student bash"
+
+],
+
+answer:2
+
+}
+
+];
+
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title> Quiz21 – Linux Service Management </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 21 – 2026</h2>
+<h1> Linux Service Management </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz21";
+const questions = [
+
+{
+
+q:"On a system using systemd, which process normally runs as PID 1?",
+
+options:[
+
+"systemd",
+
+"bash",
+
+"sshd",
+
+"httpd"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which command starts the Apache HTTP Server service immediately?",
+
+options:[
+
+"systemctl activate httpd",
+
+"systemctl boot httpd",
+
+"systemctl enable httpd",
+
+"systemctl start httpd"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"What does systemctl enable httpd primarily do?",
+
+options:[
+
+"Stops httpd immediately",
+
+"Starts httpd immediately",
+
+"Configures httpd to start automatically at boot",
+
+"Deletes the httpd unit file"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command both starts httpd immediately and configures it to start automatically at boot?",
+
+options:[
+
+"systemctl boot --start httpd",
+
+"systemctl start --enable httpd",
+
+"systemctl enable --now httpd",
+
+"systemctl activate --boot httpd"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command stops a currently running httpd service?",
+
+options:[
+
+"systemctl disable httpd",
+
+"systemctl stop httpd",
+
+"systemctl off httpd",
+
+"systemctl remove httpd"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"What is the difference between systemctl stop httpd and systemctl disable httpd?",
+
+options:[
+
+"stop affects boot configuration, while disable kills the process",
+
+"stop affects runtime state, while disable affects automatic startup",
+
+"disable starts the service and stop enables it",
+
+"Both commands always do exactly the same thing"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command displays detailed current status information for the httpd service?",
+
+options:[
+
+"systemctl showstatus httpd",
+
+"systemctl inspect-service httpd",
+
+"systemctl status httpd",
+
+"systemctl details httpd"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command checks whether the httpd service is currently active without displaying the full status output?",
+
+options:[
+
+"systemctl active-status httpd",
+
+"systemctl is-active httpd",
+
+"systemctl is-running httpd",
+
+"systemctl check-active httpd"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command checks whether httpd is configured to start automatically through systemd boot targets?",
+
+options:[
+
+"systemctl is-enabled httpd",
+
+"systemctl boot-status httpd",
+
+"systemctl is-active httpd",
+
+"systemctl auto-start httpd"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"What does systemctl restart httpd normally do?",
+
+options:[
+
+"Stops and then starts the service",
+
+"Only reloads configuration without restarting the service",
+
+"Only enables the service for boot",
+
+"Disables the service permanently"
+
+],
+
+answer:0
+
+},
+
+{
+
+q:"What is the primary purpose of systemctl reload httpd?",
+
+options:[
+
+"Delete all Apache processes",
+
+"Change the Apache package version",
+
+"Disable Apache at boot",
+
+"Request configuration reload without a full service restart"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command shows the journal messages associated with the httpd service?",
+
+options:[
+
+"systemctl journal httpd",
+
+"journalctl -u httpd",
+
+"logsctl httpd",
+
+"journalctl --service-only httpd"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"A service is enabled but currently inactive. What does this most directly mean?",
+
+options:[
+
+"The service is permanently deleted",
+
+"The service is currently running and disabled",
+
+"The service unit file does not exist",
+
+"The service is configured for automatic startup but is not currently running"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which systemctl command lists currently active service units?",
+
+options:[
+
+"systemctl active-services",
+
+"systemctl services --running-only",
+
+"systemctl show-services",
+
+"systemctl list-units --type=service"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command lists service units that are enabled for automatic startup?",
+
+options:[
+
+"systemctl show-enabled-services",
+
+"systemctl enabled-services",
+
+"systemctl list-unit-files --type=service --state=enabled",
+
+"systemctl list-units --active-services"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"A service is running, but systemctl enable service-name reports that it is not enabled. What does this most directly mean?",
+
+options:[
+
+"The service has no PID",
+
+"The service cannot currently be running",
+
+"The service unit is necessarily broken",
+
+"The service is running now but is not configured for automatic startup"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"Where are administrator-created systemd unit files commonly placed so they can override or extend vendor-provided units?",
+
+options:[
+
+"/tmp/systemd",
+
+"/etc/systemd/system",
+
+"/home/systemd",
+
+"/var/log/systemd"
+
+],
+
+answer:1
+
+},
+
+{
+
+q:"An administrator runs systemctl restart httpd and receives a failure. Which command is most useful for seeing recent httpd error messages?",
+
+options:[
+
+"systemctl get-default",
+
+"systemctl enable httpd",
+
+"systemctl is-enabled httpd",
+
+"journalctl -u httpd -n 50"
+
+],
+
+answer:3
+
+},
+
+{
+
+q:"A service starts successfully with systemctl start myservice but does not start after reboot. Which issue should be checked first?",
+
+options:[
+
+"Whether the shell prompt is customized",
+
+"Whether the service has a PID while stopped",
+
+"Whether the service is enabled",
+
+"Whether journalctl is installed"
+
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command enables a service for automatic startup and immediately starts it?",
+
+options:[
+
+"systemctl start --boot myservice",
+
+"systemctl boot-enable myservice",
+
+"systemctl enable --now myservice",
+
+"systemctl activate --persistent myservice"
+
+],
+
+answer:2
+
+}
+
+];
+
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>
