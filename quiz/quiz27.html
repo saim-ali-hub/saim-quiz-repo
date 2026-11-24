@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title> Quiz27 – Ansible III </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 27 – 2026</h2>
+<h1> Ansible III </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz27";
+const questions = [
+{
+
+q:"What is the primary purpose of the loop keyword in an Ansible task?",
+
+options:[
+"To repeat a task for multiple items in a list",
+"To repeat a task indefinitely",
+"To execute tasks in reverse order",
+"To execute a playbook on multiple control nodes"
+],
+
+answer:0
+
+},
+
+{
+
+q:"Consider the following task: - name: Create users; user: name={{ item }} state=present; loop: [ali, ahmed, sara]. How many user accounts will this task attempt to manage?",
+
+options:[
+"Two accounts",
+"Three accounts",
+"One account",
+"Four accounts"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which variable is commonly used inside an Ansible loop to reference the current item?",
+
+options:[
+"{{ loop }}",
+"{{ register }}",
+"{{ ansible_loop }}",
+"{{ item }}"
+],
+
+answer:3
+
+},
+
+{
+
+q:"Where can play-level variables normally be defined in an Ansible playbook?",
+
+options:[
+"Under the tasks section only",
+"Under the vars section",
+"Under the notify section",
+"Under the hosts section"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Consider this playbook variable: vars: http_port: 8080. Which expression references this variable in a task?",
+
+options:[
+"%http_port%",
+"[http_port]",
+"$http_port",
+"{{ http_port }}"
+],
+
+answer:3
+
+},
+
+{
+
+q:"What is the purpose of the register keyword in an Ansible task?",
+
+options:[
+"To trigger a handler",
+"To define the remote login password",
+"To store the result returned by a task in a variable",
+"To define a new inventory group"
+],
+
+answer:2
+
+},
+
+{
+
+q:"Consider the following task: - name: Check hostname; command: hostname; register: host_result. Which expression displays the command's standard output in a later debug task?",
+
+options:[
+"{{ host_result.name }}",
+"{{ host_result.hostname }}",
+"{{ host_result.stdout }}",
+"{{ host_result.register }}"
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which Ansible module is used to display messages or variable values during playbook execution?",
+
+options:[
+"setup",
+"copy",
+"file",
+"debug"
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which keyword is used to execute a task only when a specified condition is true?",
+
+options:[
+"notify",
+"when",
+"register",
+"loop"
+],
+
+answer:1
+
+},
+
+{
+
+q:"What is the primary purpose of handlers in an Ansible playbook?",
+
+options:[
+"To execute actions when notified by a task, typically when that task reports a change",
+"To establish SSH connections to managed hosts",
+"To execute tasks repeatedly for every item in a list",
+"To define variables for all managed hosts"
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which keyword is used inside a task to trigger a handler when the task reports a change?",
+
+options:[
+"listen",
+"delegate_to",
+"notify",
+"register"
+],
+
+answer:2
+
+},
+
+{
+
+q:"Consider this task: copy: src=httpd.conf dest=/etc/httpd/conf/httpd.conf; notify: Restart Apache. What happens when the copy task reports a change?",
+
+options:[
+"The playbook stops executing",
+"The copy task is executed again",
+"All handlers are executed immediately",
+"The Apache handler is notified"
+],
+
+answer:3
+
+},
+
+{
+
+q:"When does an Ansible handler normally execute after being notified?",
+
+options:[
+"Only when manually executed from the command line",
+"Before the first task",
+"At the end of the play's task execution, before the play finishes",
+"Immediately after every task"
+],
+
+answer:2
+
+},
+
+{
+
+q:"If a handler is notified by multiple tasks during the same play, how many times does it normally execute?",
+
+options:[
+"Once for every notification",
+"Twice regardless of notifications",
+"It never executes automatically",
+"Once"
+],
+
+answer:3
+
+},
+
+{
+
+q:"What is the purpose of the listen keyword in an Ansible handler?",
+
+options:[
+"To execute tasks on the control node",
+"To define a topic that one or more handlers can listen for",
+"To select inventory hosts",
+"To capture command output"
+],
+
+answer:1
+
+},
+
+{
+
+q:"What is the purpose of the delegate_to keyword in an Ansible task?",
+
+options:[
+"To execute a task on a different host than the current inventory host",
+"To skip execution on managed hosts",
+"To execute all tasks as root",
+"To register the output of a task"
+],
+
+answer:0
+
+},
+
+{
+
+q:"Consider the following task: - name: Run a command locally; command: hostname; delegate_to: localhost. Where will the command execute?",
+
+options:[
+"On the first host in the inventory",
+"On the inventory server",
+"On the Ansible control node, represented by localhost",
+"On every managed host"
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which keyword enables privilege escalation for a play or task in an Ansible playbook?",
+
+options:[
+"remote_user",
+"register",
+"become",
+"notify"
+],
+
+answer:2
+
+},
+
+{
+
+q:"What is the purpose of the become_user keyword?",
+
+options:[
+"To select the Ansible module",
+"To define an inventory group",
+"To specify the user account to which Ansible escalates privileges",
+"To specify the SSH connection username"
+],
+
+answer:2
+
+},
+
+{
+
+q:"What does the ignore_errors: yes directive do in an Ansible task?",
+
+options:[
+"It retries the failed task indefinitely",
+"It marks every task as successful",
+"It allows the play to continue after an eligible task failure",
+"It skips the next task"
+],
+
+answer:2
+
+}
+
+];
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>

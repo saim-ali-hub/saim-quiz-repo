@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title> Quiz34 – Docker IV </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 34 – 2026</h2>
+<h1> Docker IV </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz34";
+const questions = [
+
+  {
+    q: "What is the primary purpose of Docker networking?",
+    options: [
+      "To manage Docker images",
+      "To enable communication between containers and external networks",
+      "To allocate disk space to containers",
+      "To manage container processes"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which Docker command displays all available Docker networks?",
+    options: [
+      "docker network show",
+      "docker network list",
+      "docker network ls",
+      "docker networks"
+    ],
+    answer: 2
+  },
+
+  {
+    q: "Which network driver is used by default when Docker creates a new standalone container without specifying a network?",
+    options: [
+      "Host",
+      "None",
+      "Bridge",
+      "Overlay"
+    ],
+    answer: 2
+  },
+
+  {
+    q: "What is the default name of the bridge network created by Docker?",
+    options: [
+      "docker0",
+      "bridge",
+      "default",
+      "docker-bridge"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which command creates a new Docker bridge network named mynetwork?",
+    options: [
+      "docker network add mynetwork",
+      "docker network create mynetwork",
+      "docker create network mynetwork",
+      "docker bridge create mynetwork"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which Docker network driver allows containers to use the host machine's network stack directly?",
+    options: [
+      "Bridge",
+      "Overlay",
+      "Host",
+      "None"
+    ],
+    answer: 2
+  },
+
+  {
+    q: "What happens when a container is started with the none network driver?",
+    options: [
+      "It uses the host network",
+      "It receives an IP address from the bridge network",
+      "It has no external network connectivity by default",
+      "It automatically joins all Docker networks"
+    ],
+    answer: 2
+  },
+
+  {
+    q: "Which command connects an existing container to an existing Docker network?",
+    options: [
+      "docker network attach",
+      "docker attach network",
+      "docker network connect",
+      "docker connect network"
+    ],
+    answer: 2
+  },
+
+  {
+    q: "What is the primary purpose of Docker port mapping?",
+    options: [
+      "To assign a MAC address to a container",
+      "To expose a container's application port through a host port",
+      "To create a bridge network",
+      "To assign an IP address to a Docker host"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "What does the following command do? docker run -d -p 8080:80 nginx",
+    options: [
+      "Maps container port 8080 to host port 80",
+      "Maps host port 8080 to container port 80",
+      "Maps host port 80 to container port 8080",
+      "Exposes both ports without port mapping"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which command displays detailed information about a Docker network named mynetwork?",
+    options: [
+      "docker network inspect mynetwork",
+      "docker network status mynetwork",
+      "docker inspect network mynetwork",
+      "docker network details mynetwork"
+    ],
+    answer: 0
+  },
+
+  {
+    q: "What is the main advantage of using a user-defined bridge network instead of Docker's default bridge network?",
+    options: [
+      "It automatically uses the host network",
+      "It supports automatic DNS resolution between containers by name",
+      "It disables container isolation",
+      "It removes the need for IP addresses"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Two containers are connected to the same user-defined bridge network. How can one container communicate with the other?",
+    options: [
+      "Only through the host IP",
+      "Only through published ports",
+      "Using the other container's name or IP address",
+      "They cannot communicate directly"
+    ],
+    answer: 2
+  },
+
+  {
+    q: "What is the purpose of the --network option in the docker run command?",
+    options: [
+      "To specify the Docker image repository",
+      "To select the network a container should join",
+      "To configure container storage",
+      "To specify the container's hostname only"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "What does the following command accomplish? docker run -d --network mynetwork --name web nginx",
+    options: [
+      "Creates a network called web",
+      "Starts an Nginx container named web attached to mynetwork",
+      "Maps port 80 to port 8080",
+      "Starts Nginx using host networking"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which command removes a Docker network named mynetwork?",
+    options: [
+      "docker network delete mynetwork",
+      "docker rm network mynetwork",
+      "docker network remove mynetwork",
+      "docker network rm mynetwork"
+    ],
+    answer: 3
+  },
+
+  {
+    q: "What happens if you try to remove a Docker network that still has connected containers?",
+    options: [
+      "Docker automatically stops all containers",
+      "Docker automatically disconnects all containers",
+      "Docker normally refuses to remove the network",
+      "Docker removes the network but keeps its configuration"
+    ],
+    answer: 2
+  },
+
+  {
+    q: "Which command displays the IP address assigned to a container?",
+    options: [
+      "docker inspect container_name",
+      "docker ip container_name",
+      "docker network ip container_name",
+      "docker show ip container_name"
+    ],
+    answer: 0
+  },
+
+  {
+    q: "What is the purpose of the Docker overlay network driver?",
+    options: [
+      "To connect containers to the host's local filesystem",
+      "To enable communication between containers across multiple Docker hosts",
+      "To disable networking for containers",
+      "To expose container ports to the internet"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which network driver is commonly used for communication between containers running on different Docker hosts?",
+    options: [
+      "Bridge",
+      "Host",
+      "Overlay",
+      "None"
+    ],
+    answer: 2
+  }
+
+];
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>

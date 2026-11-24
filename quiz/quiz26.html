@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title> Quiz26 – Ansible II </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 26 – 2026</h2>
+<h1> Ansible II </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz26";
+
+
+const questions = [
+
+{
+
+q:"Which option enables privilege escalation when executing an Ansible ad-hoc command?",
+
+options:[
+"-i",
+"-b",
+"-u",
+"-m"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which option specifies the remote SSH username in an Ansible ad-hoc command?",
+
+options:[
+"-b",
+"-a",
+"-u",
+"-i"
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which command installs the httpd package on all hosts in the inventory using an Ansible ad-hoc command?",
+
+options:[
+"ansible all -m service -a 'name=httpd state=present' -b",
+"ansible all -m dnf -a 'name=httpd state=present' -b",
+"ansible all -m file -a 'name=httpd state=present' -b",
+"ansible all -m user -a 'name=httpd state=present' -b"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which ad-hoc command creates a directory named /opt/backup with permissions 0755?",
+
+options:[
+"ansible all -m file -a 'path=/opt/backup state=directory mode=0755'",
+"ansible all -m service -a 'name=/opt/backup mode=0755'",
+"ansible all -m user -a 'name=/opt/backup mode=0755'",
+"ansible all -m copy -a 'path=/opt/backup mode=0755'"
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which ad-hoc command retrieves the contents of /etc/hostname from a managed host and saves the file on the control node?",
+
+options:[
+"ansible all -m template -a 'src=/etc/hostname dest=/tmp/'",
+"ansible all -m fetch -a 'src=/etc/hostname dest=/tmp/'",
+"ansible all -m file -a 'path=/etc/hostname state=present'",
+"ansible all -m copy -a 'src=/etc/hostname dest=/tmp/'"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which of the following is not a valid state commonly used with the Ansible service module?",
+
+options:[
+"stopped",
+"restarted",
+"installed",
+"started"
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which ad-hoc command displays the operating system distribution and version of managed hosts?",
+
+options:[
+"ansible all -m file -a 'path=/etc/os-release'",
+"ansible all -m ping",
+"ansible all -m service -a 'name=os-release'",
+"ansible all -m setup -a 'filter=ansible_distribution*'"
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command executes an ad-hoc command only against hosts belonging to the dev inventory group?",
+
+options:[
+"ansible all -m ping",
+"ansible prod -m ping",
+"ansible hosts -m ping",
+"ansible dev -m ping"
+],
+
+answer:3
+
+},
+
+{
+
+q:"The Ansible command module executes commands through a shell by default, allowing shell operators such as pipes and redirection.",
+
+options:[
+"True",
+"False"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Ansible ad-hoc commands can be used to manage users, groups, packages, files, and services on managed hosts without creating a playbook.",
+
+options:[
+"True",
+"False"
+],
+
+answer:0
+
+},
+
+{
+
+q:"What is an Ansible playbook?",
+
+options:[
+"A YAML file containing one or more plays that define automation tasks",
+"A file used only to store Ansible variables",
+"A configuration file used only to define inventory groups",
+"A Python script used to execute Linux commands"
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which file extension is commonly used for Ansible playbooks?",
+
+options:[
+".conf",
+".yml or .yaml",
+".sh",
+".py"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command executes an Ansible playbook named site.yml?",
+
+options:[
+"ansible-inventory site.yml",
+"ansible-config site.yml",
+"ansible site.yml",
+"ansible-playbook site.yml"
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which YAML keyword identifies the inventory hosts or group targeted by a play?",
+
+options:[
+"tasks",
+"hosts",
+"name",
+"vars"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which keyword defines the list of tasks within an Ansible play?",
+
+options:[
+"inventory",
+"tasks",
+"register",
+"handlers"
+],
+
+answer:1
+
+},
+
+{
+
+q:"What is the purpose of the name keyword in an Ansible playbook?",
+
+options:[
+"To define the SSH username",
+"To define the inventory hostname",
+"To specify the module arguments",
+"To provide a descriptive label for a play or task"
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which command checks the syntax of a playbook named webserver.yml without executing its tasks?",
+
+options:[
+"ansible-config validate webserver.yml",
+"ansible-playbook webserver.yml --syntax-check",
+"ansible-playbook webserver.yml --check",
+"ansible webserver.yml --syntax"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command executes only tasks tagged with install in a playbook named site.yml?",
+
+options:[
+"ansible-playbook site.yml --list-hosts install",
+"ansible-playbook site.yml --skip-tags install",
+"ansible-playbook site.yml --tags install",
+"ansible-playbook site.yml --limit install"
+],
+
+answer:2
+
+},
+
+{
+
+q:"What is the purpose of tags in an Ansible playbook?",
+
+options:[
+"To selectively execute or skip particular tasks",
+"To define variables for each inventory host",
+"To assign IP addresses to managed hosts",
+"To enable SSH authentication"
+],
+
+answer:0
+
+},
+
+{
+
+q:"Which command lists the tasks associated with the install tag without executing them?",
+
+options:[
+"ansible-playbook site.yml --list-tags",
+"ansible-playbook site.yml --skip-tags install",
+"ansible-playbook site.yml --list-tasks --tags install",
+"ansible-playbook site.yml --tags install"
+],
+
+answer:2
+
+}
+
+];
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>
+

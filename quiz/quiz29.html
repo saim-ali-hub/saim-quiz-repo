@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title> Quiz29 – Ansible V </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 29 – 2026</h2>
+<h1> Ansible V </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz29";
+
+const questions = [
+
+{
+
+q:"In a playbook, which keyword is used to execute a role?",
+
+options:[
+"handlers:",
+"roles:",
+"include_vars:",
+"tasks:"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Which command installs roles listed in a requirements.yml file?",
+
+options:[
+"ansible-galaxy install -r requirements.yml",
+"ansible-playbook -r requirements.yml",
+"ansible-galaxy init -r requirements.yml",
+"ansible-config dump -r requirements.yml"
+],
+
+answer:0
+
+},
+
+{
+
+q:"What is the purpose of the meta/main.yml file in an Ansible role?",
+
+options:[
+"To store static files copied to managed hosts",
+"To store the role's default variables",
+"To define role metadata and dependencies",
+"To define all tasks executed by the role"
+],
+
+answer:2
+
+},
+
+{
+
+q:"A role named apache is installed in /etc/ansible/roles/apache. Which directory contains its main task file?",
+
+options:[
+"/etc/ansible/roles/apache/defaults/",
+"/etc/ansible/roles/apache/meta/",
+"/etc/ansible/roles/apache/handlers/",
+"/etc/ansible/roles/apache/tasks/"
+],
+
+answer:3
+
+},
+
+{
+
+q:"What does the command ansible-galaxy role list help you identify?",
+
+options:[
+"The variables defined in a playbook",
+"The hosts in the current inventory",
+"The roles installed in configured role paths",
+"The tasks currently running on managed hosts"
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which of the following is not standard directories commonly created by ansible-galaxy init for a role?",
+
+options:[
+"templates/",
+"inventory/",
+"tasks/",
+"handlers/"
+],
+
+answer:1
+
+},
+
+{
+
+q:"You want to install a role into a specific directory instead of the default role path. Which option can you use with ansible-galaxy install?",
+
+options:[
+"-t",
+"-m",
+"-i",
+"-p"
+],
+
+answer:3
+
+},
+
+{
+
+q:"In a playbook, what is the purpose of the roles: section?",
+
+options:[
+"To define the inventory groups",
+"To define the remote SSH username",
+"To configure the Ansible control node's Python interpreter",
+"To specify reusable roles that should run in the play"
+],
+
+answer:3
+
+},
+
+{
+
+q:"Ansible roles can be reused in multiple playbooks.",
+
+options:[
+"True",
+"False"
+],
+
+answer:0
+
+},
+
+{
+
+q:"The defaults/main.yml file has higher variable precedence than vars/main.yml within an Ansible role.",
+
+options:[
+"True",
+"False"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Where are role dependencies normally declared in an Ansible role?",
+
+options:[
+"defaults/main.yml",
+"tasks/main.yml",
+"handlers/main.yml",
+"meta/main.yml"
+],
+
+answer:3
+
+},
+
+{
+
+q:"A role named application depends on a role named database. What normally happens when the application role is executed with this dependency declared in meta/main.yml?",
+
+options:[
+"The database role is installed but never executed",
+"Ansible ignores the dependency unless it is listed in inventory",
+"The database role is executed after the application role",
+"The database role is automatically executed before the application role"
+],
+
+answer:3
+
+},
+
+{
+
+q:"Which keyword can be used inside a role task to notify a handler?",
+
+options:[
+"notify",
+"register",
+"include_vars",
+"delegate_to"
+],
+
+answer:0
+
+},
+
+{
+
+q:"A role task notifies a handler named Restart Apache. The task reports changed. When does the handler normally run?",
+
+options:[
+"Only when the playbook is executed a second time",
+"Before the role's first task",
+"At the end of the play's task section, unless flushed earlier",
+"Immediately before the notifying task finishes"
+],
+
+answer:2
+
+},
+
+{
+
+q:"Which statements about variables in an Ansible role are correct?",
+
+options:[
+"tasks/main.yml is the standard location for role metadata",
+"vars/main.yml defines role variables",
+"meta/main.yml defines role default variables",
+"handlers/main.yml defines role default variables"
+],
+
+answer:1
+
+},
+
+{
+
+q:"You want to run only tasks tagged install from a playbook that uses roles. Which command-line option should you use?",
+
+options:[
+"--list-hosts install",
+"--tags install",
+"--skip-tags install",
+"--syntax-check install"
+],
+
+answer:1
+
+},
+
+{
+
+q:"Where can you configure a custom role search path for Ansible?",
+
+options:[
+"The inventory_path setting in ansible.cfg",
+"The forks setting in ansible.cfg",
+"The remote_user setting in ansible.cfg",
+"The roles_path setting in ansible.cfg"
+],
+
+answer:3
+
+},
+
+{
+
+q:"Consider a playbook with hosts: web and roles listed in the order common followed by apache. In what order are these roles normally executed?",
+
+options:[
+"Both roles execute simultaneously",
+"common followed by apache",
+"apache followed by common",
+"Only the first role executes"
+],
+
+answer:1
+
+},
+
+{
+
+q:"You have created a custom role named nginx_setup in /opt/ansible/roles. Ansible cannot find it when running a playbook from another directory. What is the most appropriate configuration change?",
+
+options:[
+"Move nginx_setup into the inventory directory",
+"Add nginx_setup to the managed hosts' /etc/hosts file",
+"Add nginx_setup to the forks setting",
+"Add /opt/ansible/roles to roles_path in ansible.cfg"
+],
+
+answer:3
+
+},
+
+{
+
+q:"Ansible Galaxy can be used to create a new role structure locally without downloading an existing role.",
+
+options:[
+"True",
+"False"
+],
+
+answer:0
+
+}
+
+];
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>

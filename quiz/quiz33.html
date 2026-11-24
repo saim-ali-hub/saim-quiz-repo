@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title> Quiz33 – Docker III </title>
+<style>
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(to right,#0f172a,#1e293b);
+color:#f8fafc;
+padding:30px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:30px;}
+.header h1{color:#38bdf8;}
+
+.question-list{display:flex;flex-direction:column;gap:12px;}
+
+.q-item{
+background:#1e293b;
+padding:18px;
+border-left:5px solid #38bdf8;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.q-item:hover{transform:scale(1.01);}
+
+/* ✅ question number styling (RESTORED GREEN BADGE LOOK) */
+.q-num{
+color:#22c55e;
+font-weight:bold;
+margin-right:8px;
+}
+
+.q-item.done{
+background:#bbf7d0 !important;
+color:#052e16;
+border-left:6px solid #22c55e;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#0f172a;
+padding:25px;
+border-radius:12px;
+width:90%;max-width:750px;
+}
+
+.option{
+background:#334155;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+cursor:pointer;
+}
+
+.option:hover{background:#475569;}
+
+.popup{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 15px;
+border-radius:8px;
+display:none;
+color:#000;
+z-index:9999;
+}
+
+pre{
+background:#020617;
+padding:12px;
+border-radius:10px;
+overflow-x:auto;
+color:#22c55e;
+}
+
+.result{
+line-height:1.8;
+font-size:18px;
+}
+
+/* RESULT COLORS UPDATED */
+.result-correct{color:#22c55e;font-weight:bold;}
+.result-wrong{color:#f8fafc;}
+
+.review-box{
+margin-top:15px;
+background:#0b1220;
+padding:10px;
+border-radius:8px;
+border-left:4px solid #ef4444;
+}
+.review-title{color:#ef4444;font-weight:bold;margin-bottom:5px;}
+
+.logo-container{
+  position: relative;
+  display: inline-block;   /* key fix */
+  background: rgba(255,255,255,0.95);
+  padding: 10px 15px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  top: 15px;
+}
+
+.logo-container img{
+width:200px;
+height:auto;
+display:block;
+}
+
+</style>
+</head>
+<body>
+<body>
+
+<div class="logo-container">
+    <img src="/images/image.png" alt="Logo">
+</div>
+
+<div class="container">
+<div class="header">
+<h1>LINOOPTEK INNOVATIONS </h1>
+<h2>QUIZ 33 – 2026</h2>
+<h1> Docker III </h1>
+</div>
+
+<div class="question-list" id="qList"></div>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+<h2 id="qText"></h2>
+<div id="options"></div>
+<button onclick="closeModal()">Move Back</button>
+</div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const QUIZ_NAME = "quiz33";
+const questions = [
+
+  {
+    q: "What is the difference between a Docker volume and a bind mount?",
+    options: [
+      "Volumes are managed by Docker, while bind mounts use a specified host filesystem path",
+      "Bind mounts are stored inside Docker images",
+      "Volumes require port mapping",
+      "There is no difference between them"
+    ],
+    answer: 0
+  },
+
+  {
+    q: "Consider the following command: docker run -v /opt/app:/app nginx. What does it do?",
+    options: [
+      "Copies /app from the container to /opt/app",
+      "Mounts the host directory /opt/app inside the container at /app",
+      "Creates a named volume called /opt/app",
+      "Maps host port 80 to container port 80"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which Docker network driver is used by default when creating a standalone container without specifying a network?",
+    options: [
+      "Host",
+      "None",
+      "Bridge",
+      "Overlay"
+    ],
+    answer: 2
+  },
+
+  {
+    q: "What is the main advantage of using a user-defined bridge network?",
+    options: [
+      "Containers can communicate using their names through Docker's embedded DNS",
+      "Containers cannot communicate with each other",
+      "It automatically publishes all container ports",
+      "It disables network isolation"
+    ],
+    answer: 0
+  },
+
+  {
+    q: "Which command is used to create a user-defined bridge network named app-net?",
+    options: [
+      "docker network add app-net",
+      "docker network create app-net",
+      "docker create network app-net",
+      "docker network start app-net"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "What is the purpose of the EXPOSE instruction in a Dockerfile?",
+    options: [
+      "It automatically publishes the port on the host",
+      "It documents the port on which the containerized application listens",
+      "It opens the port in the host firewall",
+      "It starts the application"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "What is the difference between CMD and ENTRYPOINT in a Dockerfile?",
+    options: [
+      "Both instructions perform exactly the same function",
+      "CMD defines default command or arguments, while ENTRYPOINT configures the main executable",
+      "ENTRYPOINT is used only during image building",
+      "CMD is used only to expose ports"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which Dockerfile instruction is used to define a build-time variable?",
+    options: [
+      "ENV",
+      "ARG",
+      "RUN",
+      "USER"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "What is the main difference between ARG and ENV in a Dockerfile?",
+    options: [
+      "ARG is available during image building, while ENV sets environment variables available to containers at runtime",
+      "ENV is available only during image building",
+      "ARG automatically publishes ports",
+      "Both are used only to create directories"
+    ],
+    answer: 0
+  },
+
+  {
+    q: "What does the following Dockerfile instruction do? COPY index.html /usr/share/nginx/html/",
+    options: [
+      "Copies index.html from the image to the host",
+      "Copies index.html from the build context into the image",
+      "Downloads index.html from the internet",
+      "Executes index.html during image building"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which command is used to build a Docker image from a Dockerfile in the current directory and tag it as myapp:v1?",
+    options: [
+      "docker run -t myapp:v1 .",
+      "docker create myapp:v1",
+      "docker build -t myapp:v1 .",
+      "docker commit -t myapp:v1 ."
+    ],
+    answer: 2
+  },
+
+  {
+    q: "Which Docker command is used to display the history of an image, including its build layers?",
+    options: [
+      "docker inspect",
+      "docker history",
+      "docker logs",
+      "docker stats"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "What is the purpose of the USER instruction in a Dockerfile?",
+    options: [
+      "To create a new Linux user automatically",
+      "To specify the user under which subsequent instructions and the container process run",
+      "To authenticate with Docker Hub",
+      "To define environment variables"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "What is the purpose of the WORKDIR instruction in a Dockerfile?",
+    options: [
+      "To create a Docker volume",
+      "To specify the working directory for subsequent instructions",
+      "To define the host directory",
+      "To change the container hostname"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "What happens when you execute the following command? docker commit web1 myweb:v1",
+    options: [
+      "It pushes the container to Docker Hub",
+      "It creates a new image from the container's current filesystem state",
+      "It removes the container",
+      "It starts the container"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which statement about docker commit is correct?",
+    options: [
+      "The container must be running to create an image",
+      "The container must be stopped before creating an image",
+      "It can create an image from a running or stopped container",
+      "It only works with containers created from official images"
+    ],
+    answer: 2
+  },
+
+  {
+    q: "Which command is used to upload a locally built Docker image to Docker Hub?",
+    options: [
+      "docker pull",
+      "docker push",
+      "docker load",
+      "docker import"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "What is the purpose of the docker exec command?",
+    options: [
+      "To create a new Docker image",
+      "To execute a command inside a running container",
+      "To stop a running container",
+      "To delete a Docker volume"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "What is the difference between docker save and docker export?",
+    options: [
+      "Both commands perform exactly the same operation",
+      "docker save saves an image with its layers and metadata, while docker export exports a container's filesystem as a tar archive",
+      "docker export saves Docker images with all their layers",
+      "docker save exports only container logs"
+    ],
+    answer: 1
+  },
+
+  {
+    q: "Which Docker command displays real-time resource usage statistics for running containers?",
+    options: [
+      "docker inspect",
+      "docker ps",
+      "docker stats",
+      "docker info"
+    ],
+    answer: 2
+  }
+
+];
+const list=document.getElementById("qList");
+const modal=document.getElementById("modal");
+const qText=document.getElementById("qText");
+const options=document.getElementById("options");
+const popup=document.getElementById("popup");
+
+let current=0;
+let correct=0;
+let wrong=0;
+let answered=new Array(questions.length).fill(false);
+let wrongList=[];
+let qItems=[];
+
+function toast(msg,color){
+popup.innerText=msg;
+popup.style.background=color;
+popup.style.display="block";
+setTimeout(()=>popup.style.display="none",1500);
+}
+
+questions.forEach((q,i)=>{
+const div=document.createElement("div");
+div.className="q-item";
+div.innerHTML=`<span class='q-num'>Q${i+1}.</span> ${q.q}`;
+div.onclick=()=>openQ(i);
+list.appendChild(div);
+qItems.push(div);
+});
+
+function openQ(i){
+current=i;
+modal.style.display="flex";
+let q=questions[i];
+qText.innerHTML=`<strong>${q.q}</strong>`+(q.output?`<pre>${q.output}</pre>`:"");
+options.innerHTML="";
+q.options.forEach((o,idx)=>{
+const d=document.createElement("div");
+d.className="option";
+d.innerText=o;
+d.onclick=()=>check(idx);
+options.appendChild(d);
+});
+}
+
+function check(i){
+if(answered[current]) return;
+answered[current]=true;
+qItems[current].classList.add("done");
+
+if(i===questions[current].answer){
+correct++;
+toast("Correct","#22c55e");
+}else{
+wrong++;
+toast("Wrong","#ef4444");
+wrongList.push({q:questions[current].q,correct:questions[current].options[questions[current].answer]});
+}
+
+if(correct+wrong===questions.length){
+    setTimeout(() => {
+        showResult();
+        sendResultToServer();
+    }, 500);
+}
+}
+
+function showResult(){
+modal.style.display="flex";
+qText.innerHTML="<strong>Result Summary</strong>";
+
+let reviewHTML="";
+if(wrongList.length>0){
+reviewHTML+=`<div class='review-box'><div class='review-title'>Wrong Answers Review</div>`;
+wrongList.forEach(w=>{
+reviewHTML+=`<p><strong>Q:</strong> ${w.q}<br><strong>Correct:</strong> ${w.correct}</p><hr>`;
+});
+reviewHTML+=`</div>`;
+}
+
+options.innerHTML=`
+<div class="result">
+<p class="result-correct">Correct: ${correct}</p>
+<p class="result-wrong">Wrong: ${wrong}</p>
+<p class="result-correct">Percentage: ${(correct/questions.length*100).toFixed(2)}%</p>
+${reviewHTML}
+</div>
+`;
+}
+
+function sendResultToServer() {
+
+    let name = prompt("Enter your name:");
+
+    let percent = (correct / questions.length * 100).toFixed(2);
+
+    fetch("/api.php?action=save_result", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "name=" + encodeURIComponent(name) +
+            "&quiz=" + encodeURIComponent(QUIZ_NAME) +
+            "&total=" + questions.length +
+            "&passed=" + correct +
+            "&percent=" + percent
+    })
+    .then(res => res.text())
+    .then(data => console.log("Saved:", data))
+    .catch(err => console.log("Error:", err));
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+</script>
+
+</body>
+</html>

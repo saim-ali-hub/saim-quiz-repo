@@ -1,5 +1,5 @@
 #!/bin/bash
-QUIZ=quiz23
+QUIZ=quiz24
 INPUT="/var/www/quiz/result/$QUIZ/result_${QUIZ}.txt"
 OUTPUT="/var/www/quiz/result/$QUIZ/result_${QUIZ}_sorted.txt"
 CSV="/var/www/quiz/result/$QUIZ/result_${QUIZ}_sorted.csv"
